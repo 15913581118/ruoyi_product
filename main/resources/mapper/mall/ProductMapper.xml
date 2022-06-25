@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mall.mapper.ProductMapper">
+    
+    <resultMap type="Product" id="ProductResult">
+        <result property="pid"    column="pid"    />
+        <result property="pname"    column="pname"    />
+        <result property="kinds"    column="kinds"    />
+        <result property="price"    column="price"    />
+        <result property="color"    column="color"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="brand"    column="brand"    />
+    </resultMap>
+
+    <sql id="selectProductVo">
+        select pid, pname, kinds, price, color, create_time, brand from product
+    </sql>
+
+    <select id="selectProductList" parameterType="Product" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        <where>  
+            <if test="pname != null  and pname != ''"> and pname like concat('%', #{pname}, '%')</if>
+            <if test="kinds != null  and kinds != ''"> and kinds = #{kinds}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="color != null  and color != ''"> and color = #{color}</if>
+            <if test="brand != null  and brand != ''"> and brand = #{brand}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductByPid" parameterType="Long" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        where pid = #{pid}
+    </select>
+        
+    <insert id="insertProduct" parameterType="Product" useGeneratedKeys="true" keyProperty="pid">
+        insert into product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pname != null and pname != ''">pname,</if>
+            <if test="kinds != null">kinds,</if>
+            <if test="price != null">price,</if>
+            <if test="color != null">color,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="brand != null">brand,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pname != null and pname != ''">#{pname},</if>
+            <if test="kinds != null">#{kinds},</if>
+            <if test="price != null">#{price},</if>
+            <if test="color != null">#{color},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="brand != null">#{brand},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProduct" parameterType="Product">
+        update product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pname != null and pname != ''">pname = #{pname},</if>
+            <if test="kinds != null">kinds = #{kinds},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="color != null">color = #{color},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="brand != null">brand = #{brand},</if>
+        </trim>
+        where pid = #{pid}
+    </update>
+
+    <delete id="deleteProductByPid" parameterType="Long">
+        delete from product where pid = #{pid}
+    </delete>
+
+    <delete id="deleteProductByPids" parameterType="String">
+        delete from product where pid in 
+        <foreach item="pid" collection="array" open="(" separator="," close=")">
+            #{pid}
+        </foreach>
+    </delete>
+
+</mapper>
